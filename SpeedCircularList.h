@@ -172,48 +172,14 @@ public:
             return;
         }
 
-        // Use fast search if available
-        if (fast_search_list_size > 0) {
-            Node* curr = head;
-
-            while (true) {
-                // If we found the node
-                if (code <= curr->bound) {
-                    curr->kv_map[str] = value;
-                    return;
-                }
-
-                // Try to use fast_search_list to skip ahead
-                bool jumped = false;
-                for (int k = fast_search_list_size - 1; k >= 0; --k) {
-                    Node* target = curr->fast_search_list[k];
-                    // We can jump if the target's bound is still less than code
-                    // or if target's bound is >= code (we'll check it in the next iteration)
-                    if (target->bound < code) {
-                        curr = target;
-                        jumped = true;
-                        break;
-                    }
-                }
-
-                // If we couldn't jump, move to next node
-                if (!jumped) {
-                    curr = curr->next;
-                }
+        // Find the correct node for this code
+        Node* curr = head;
+        for (int i = 0; i < list_size; ++i) {
+            if (code <= curr->bound) {
+                curr->kv_map[str] = value;
+                return;
             }
-        } else {
-            // Use naive traversal
-            Node* curr = head->next;
-            Node* prev = head;
-
-            for (int i = 1; i < list_size; ++i) {
-                if (code > prev->bound && code <= curr->bound) {
-                    curr->kv_map[str] = value;
-                    return;
-                }
-                prev = curr;
-                curr = curr->next;
-            }
+            curr = curr->next;
         }
     }
 
@@ -238,52 +204,17 @@ public:
             return T();
         }
 
-        // Use fast search if available
-        if (fast_search_list_size > 0) {
-            Node* curr = head;
-
-            while (true) {
-                // If we found the node
-                if (code <= curr->bound) {
-                    auto it = curr->kv_map.find(str);
-                    if (it != curr->kv_map.end()) {
-                        return it->second;
-                    }
-                    return T();
+        // Find the correct node for this code
+        Node* curr = head;
+        for (int i = 0; i < list_size; ++i) {
+            if (code <= curr->bound) {
+                auto it = curr->kv_map.find(str);
+                if (it != curr->kv_map.end()) {
+                    return it->second;
                 }
-
-                // Try to use fast_search_list to skip ahead
-                bool jumped = false;
-                for (int k = fast_search_list_size - 1; k >= 0; --k) {
-                    Node* target = curr->fast_search_list[k];
-                    if (target->bound < code) {
-                        curr = target;
-                        jumped = true;
-                        break;
-                    }
-                }
-
-                // If we couldn't jump, move to next node
-                if (!jumped) {
-                    curr = curr->next;
-                }
+                return T();
             }
-        } else {
-            // Use naive traversal
-            Node* curr = head->next;
-            Node* prev = head;
-
-            for (int i = 1; i < list_size; ++i) {
-                if (code > prev->bound && code <= curr->bound) {
-                    auto it = curr->kv_map.find(str);
-                    if (it != curr->kv_map.end()) {
-                        return it->second;
-                    }
-                    return T();
-                }
-                prev = curr;
-                curr = curr->next;
-            }
+            curr = curr->next;
         }
 
     	return T(); // 返回T类型默认构造函数产生的值

@@ -4,3 +4,5 @@ cmake_install.cmake
 Makefile
 code
 *.o
+test_main.cpp
+test_code
